@@ -2,10 +2,8 @@ import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { getUser } = getKindeServerSession();
   const user = await getUser();
   if (!user || user.email !== process.env.ADMIN_EMAIL) {
