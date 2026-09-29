@@ -9,6 +9,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import Link from "next/dist/client/link";
 
 const NewOrderNotificationEmail = ({
   orderId,
@@ -24,7 +25,7 @@ const NewOrderNotificationEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>New order received — {orderId}</Preview>
+      <Preview>{`New order received — ${orderId}`}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={message}>
@@ -54,8 +55,14 @@ const NewOrderNotificationEmail = ({
           <Hr style={hr} />
           <Section style={defaultPadding}>
             <Text style={{ ...text, fontSize: 13 }}>
-              View full order details and the shipping address in your
-              dashboard.
+              View full order details and the shipping address in your{" "}
+              <Link
+                href={`${process.env.NEXT_PUBLIC_SERVER_URL}/dashboard`}
+                style={{ color: "#000", textDecoration: "underline" }}
+              >
+                dashboard
+              </Link>
+              .
             </Text>
           </Section>
         </Container>

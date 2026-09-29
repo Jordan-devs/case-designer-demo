@@ -26,7 +26,7 @@ const OrderReceivedEmail = ({
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://casecobra.vercel.app";
+      : process.env.NEXT_PUBLIC_SERVER_URL;
 
   return (
     <Html>
@@ -56,13 +56,14 @@ const OrderReceivedEmail = ({
           <Section style={global.defaultPadding}>
             <Text style={adressTitle}>Shipping to: {shippingAddress.name}</Text>
             <Text style={{ ...global.text, fontSize: 14 }}>
-              {shippingAddress.street}, {shippingAddress.city},{" "}
-              {shippingAddress.state} {shippingAddress.postalCode}
+              {shippingAddress.street}, {shippingAddress.city}
+              {shippingAddress.state ? `, ${shippingAddress.state}` : ""}{" "}
+              {shippingAddress.postalCode}
             </Text>
           </Section>
           <Hr style={global.hr} />
           <Section style={global.defaultPadding}>
-            <Row style={{ display: "inline-flex gap-16", marginBottom: 40 }}>
+            <Row style={{ marginBottom: 40 }}>
               <Column style={{ width: 170 }}>
                 <Text style={global.paragraphWithBold}>Order Number</Text>
                 <Text style={track.number}>{orderId}</Text>

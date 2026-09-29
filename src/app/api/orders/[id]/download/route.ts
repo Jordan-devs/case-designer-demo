@@ -1,8 +1,12 @@
 import { db } from "@/db";
+import { generateMockup } from "@/lib/mockup";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
+export async function GET(
+  req: Request,
+  props: { params: Promise<{ id: string }> },
+) {
   const params = await props.params;
   const { getUser } = getKindeServerSession();
   const user = await getUser();
@@ -16,11 +20,28 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
   });
   if (!order) return new NextResponse("Not found", { status: 404 });
 
-  const { searchParams } = new URL(req.url);
-  const wantsOriginal = searchParams.get("type") === "original";
-  const fileUrl = wantsOriginal
-    ? order.configuration.imageUrl
-    : (order.configuration.croppedImageUrl ?? order.configuration.imageUrl);
+  const type = new URL(req.url).searchParams.get("type");
+
+  // Mockup (default): case color + photo + phone frame, flattened
+  if (type !== "original" && type !== "print") {
+    try {
+      const png = await generateMockup(order.configuration);
+      return new NextResponse(new Uint8Array(png), {
+        headers: {
+          "Content-Type": "image/png",
+          "Content-Disposition": `attachment; filename="order-${order.id}-mockup.png"`,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      return new NextResponse("Could not generate mockup", { status: 502 });
+    }
+  }
+
+  const fileUrl =
+    type === "original"
+      ? order.configuration.imageUrl
+      : (order.configuration.croppedImageUrl ?? order.configuration.imageUrl);
 
   const upstream = await fetch(fileUrl);
   if (!upstream.ok) {
@@ -29,7 +50,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
 
   const contentType = upstream.headers.get("content-type") ?? "image/png";
   const ext = contentType.split("/")[1]?.split(";")[0] ?? "png";
-  const filename = `order-${order.id}-${wantsOriginal ? "original" : "design"}.${ext}`;
+  const filename = `order-${order.id}-${type}.${ext}`;
 
   return new NextResponse(upstream.body, {
     headers: {

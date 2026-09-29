@@ -136,22 +136,6 @@ const Page = async () => {
               {orders.map((order) => (
                 <TableRow key={order.id} className="bg-accent">
                   <TableCell>
-                    <div className="flex flex-col text-sm">
-                      <a
-                        className="text-primary underline"
-                        href={`/api/orders/${order.id}/download`}
-                      >
-                        Download design
-                      </a>
-                      <a
-                        className="text-muted-foreground underline"
-                        href={`/api/orders/${order.id}/download?type=original`}
-                      >
-                        Download original
-                      </a>
-                    </div>
-                  </TableCell>
-                  <TableCell>
                     <div className="font-medium">
                       {order.shippingAddress?.name}
                     </div>
@@ -162,11 +146,33 @@ const Page = async () => {
                   <TableCell className="hidden sm:table-cell">
                     <StatusDropdown id={order.id} orderStatus={order.status} />
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden sm:table-cell">
                     {order.createdAt.toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
                     {formatPrice(order.amount)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col text-sm">
+                      <a
+                        className="text-primary underline"
+                        href={`/api/orders/${order.id}/download`}
+                      >
+                        Download mockup
+                      </a>
+                      <a
+                        className="text-muted-foreground underline"
+                        href={`/api/orders/${order.id}/download?type=print`}
+                      >
+                        Download print file
+                      </a>
+                      <a
+                        className="text-muted-foreground underline"
+                        href={`/api/orders/${order.id}/download?type=original`}
+                      >
+                        Download original
+                      </a>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
