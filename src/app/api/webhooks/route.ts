@@ -79,7 +79,7 @@ export async function POST(req: Request) {
         },
       });
 
-      await resend.emails.send({
+      const { error: customerError } = await resend.emails.send({
         from: "CaseCobra <onboarding@resend.dev>",
         to: [event.data.object.customer_details.email],
         subject: "Thanks for your order!",
@@ -97,9 +97,11 @@ export async function POST(req: Request) {
           },
         }),
       });
+      if (customerError) console.error("Customer email failed:", customerError);
+      await new Promise((r) => setTimeout(r, 1000));
 
       if (process.env.ADMIN_EMAIL) {
-        await resend.emails.send({
+        const { error: adminError } = await resend.emails.send({
           from: "CaseCobra <onboarding@resend.dev>",
           to: [process.env.ADMIN_EMAIL],
           subject: `New order — ${orderId}`,
@@ -110,6 +112,7 @@ export async function POST(req: Request) {
             customerName: session.customer_details!.name!,
           }),
         });
+        if (adminError) console.error("Admin email failed:", adminError);
       }
     }
 
